@@ -3,13 +3,18 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/Mercury1565/Aura/internal/ai"
+	"github.com/Mercury1565/Aura/internal/reviewer"
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	ctx := context.Background()
+
+	_ = godotenv.Load()
 	modelName := os.Getenv("MODEL_NAME")
 
 	if modelName == "" {
@@ -18,28 +23,28 @@ func main() {
 
 	llm, err := ai.NewGroqClient(modelName)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	stream, err := llm.Chat(ctx, ai.ChatRequest{
-		Messages: []ai.Message{
-			{Role: "user", Content: "Explain goroutines"},
-		},
-		Temperature: 0.5,
-		Stream:      true,
-	})
+	x := llm.Model()
+	fmt.Print(modelName, x)
+
+	r := reviewer.NewLLMReviewer(llm)
+
+	diff := `
+		--- a/main.go
+		+++ b/main.go
+		@@ -10,5 +10,6 @@ func main() {
+		- apiKey := "AIza_Secret_Key_123"
+		+ apiKey := os.Getenv("API_KEY")
+		+ fmt.Println("Debugging here...")
+	`
+
+	feedback, err := r.ReviewDiff(ctx, diff)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
-	for chunk := range stream {
-		if chunk.Err != nil {
-			panic(chunk.Err)
-		}
-		if chunk.Done {
-			break
-		}
-		fmt.Print(chunk.Content)
-	}
-
+	fmt.Println("--- LLM Review ---")
+	fmt.Println(feedback)
 }
