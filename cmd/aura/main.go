@@ -26,9 +26,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	x := llm.Model()
-	fmt.Print(modelName, x)
-
 	r := reviewer.NewLLMReviewer(llm)
 
 	diff := `

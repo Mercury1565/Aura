@@ -19,7 +19,7 @@ func NewLLMReviewer(llm ai.LLMClient) *LLMReviewer {
 // takes a git diff and returns the LLM's feedback
 func (r *LLMReviewer) ReviewDiff(ctx context.Context, diff string) (string, error) {
 	prompt := fmt.Sprintf(
-		"Review this git diff and find any glaring mistakes:\n\n%s",
+		ai.TestPrompt,
 		diff,
 	)
 
