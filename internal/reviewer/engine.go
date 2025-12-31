@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Mercury1565/Aura/internal/ai"
+	"github.com/bluekeyes/go-gitdiff/gitdiff"
 )
 
 type LLMReviewer struct {
@@ -17,11 +18,11 @@ func NewLLMReviewer(llm ai.LLMClient) *LLMReviewer {
 }
 
 // takes a git diff and returns the LLM's feedback
-func (r *LLMReviewer) ReviewDiff(ctx context.Context, diff string) (string, error) {
-	prompt := fmt.Sprintf(
-		ai.TestPrompt,
-		diff,
-	)
+func (r *LLMReviewer) ReviewDiff(ctx context.Context, files []*gitdiff.File) (string, error) {
+	prompt := ai.BuildPrompt(files)
+
+	fmt.Println("🚀🚀🚀--- PROMPT ---🚀🚀🚀")
+	fmt.Println(prompt)
 
 	req := ai.ChatRequest{
 		Messages: []ai.Message{
