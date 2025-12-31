@@ -2,6 +2,7 @@ package ai
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -84,4 +85,51 @@ func (g *GroqClient) Chat(ctx context.Context, req ChatRequest) (<-chan ChatChun
 	}()
 
 	return out, nil
+}
+
+func (g *GroqClient) ChatStructured(ctx context.Context, req ChatRequest) (string, error) {
+	msgs := make([]openai.ChatCompletionMessage, 0, len(req.Messages))
+	for _, m := range req.Messages {
+		msgs = append(msgs, openai.ChatCompletionMessage{
+			Role:    m.Role,
+			Content: m.Content,
+		})
+	}
+
+	var respFormat *openai.ChatCompletionResponseFormat
+
+	// SAFETY CHECK: proceed if ResponseFormat AND JSONSchema are provided
+	if req.ResponseFormat != nil && req.ResponseFormat.JSONSchema != nil {
+		schemaBytes, err := json.Marshal(req.ResponseFormat.JSONSchema.Schema)
+		if err != nil {
+			return "", fmt.Errorf("failed to marshal schema: %w", err)
+		}
+
+		// Initialize the struct pointer before assigning to its fields
+		respFormat = &openai.ChatCompletionResponseFormat{
+			Type: openai.ChatCompletionResponseFormatType(req.ResponseFormat.Type),
+			JSONSchema: &openai.ChatCompletionResponseFormatJSONSchema{
+				Name:   req.ResponseFormat.JSONSchema.Name,
+				Strict: req.ResponseFormat.JSONSchema.Strict,
+				Schema: SchemaWrapper{Bytes: schemaBytes},
+			},
+		}
+	}
+
+	resp, err := g.client.CreateChatCompletion(ctx, openai.ChatCompletionRequest{
+		Model:          g.model,
+		Messages:       msgs,
+		Temperature:    req.Temperature,
+		ResponseFormat: respFormat, // nil (default) or our structured format
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("groq completion error: %w", err)
+	}
+
+	if len(resp.Choices) == 0 {
+		return "", fmt.Errorf("no response choices returned from groq")
+	}
+
+	return resp.Choices[0].Message.Content, nil
 }

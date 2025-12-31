@@ -2,7 +2,6 @@ package reviewer
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/Mercury1565/Aura/internal/ai"
@@ -19,10 +18,7 @@ func NewLLMReviewer(llm ai.LLMClient) *LLMReviewer {
 
 // takes a git diff and returns the LLM's feedback
 func (r *LLMReviewer) ReviewDiff(ctx context.Context, files []*gitdiff.File) (string, error) {
-	prompt := ai.BuildPrompt(files)
-
-	fmt.Println("🚀🚀🚀--- PROMPT ---🚀🚀🚀")
-	fmt.Println(prompt)
+	prompt := ai.BuildPrompt(files, false)
 
 	req := ai.ChatRequest{
 		Messages: []ai.Message{
@@ -52,4 +48,27 @@ func (r *LLMReviewer) ReviewDiff(ctx context.Context, files []*gitdiff.File) (st
 	}
 
 	return builder.String(), nil
+}
+
+func (r *LLMReviewer) ReviewDiffWithStructuredOutput(ctx context.Context, files []*gitdiff.File) (string, error) {
+	prompt := ai.BuildPrompt(files, true)
+
+	req := ai.ChatRequest{
+		Messages: []ai.Message{{Role: "user", Content: prompt}},
+		ResponseFormat: &ai.ResponseFormat{
+			Type: "json_schema",
+			JSONSchema: &ai.JSONSchema{
+				Name:   "code_review",
+				Strict: true,
+				Schema: GetAuraSchema(),
+			},
+		},
+	}
+
+	jsonResponse, err := r.llm.ChatStructured(ctx, req)
+	if err != nil {
+		return "", err
+	}
+
+	return jsonResponse, nil
 }

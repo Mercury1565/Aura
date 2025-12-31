@@ -46,7 +46,8 @@ func aiTest() {
 		log.Fatalf("❌ Parser Error: %v", err)
 	}
 
-	feedback, err := r.ReviewDiff(ctx, files)
+	// feedback, err := r.ReviewDiff(ctx, files)
+	feedback, err := r.ReviewDiffWithStructuredOutput(ctx, files)
 	if err != nil {
 		log.Fatal(err)
 	}
