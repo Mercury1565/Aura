@@ -1,7 +1,5 @@
 package main
 
-// Hello there
-
 import (
 	"context"
 	"fmt"
@@ -39,7 +37,7 @@ func aiTest() {
 	// 	`
 
 	// Fetch raw diff from Git
-	raw, err := git.GetStagedDiff()
+	raw, err := git.GetStagedDiff(3)
 	if err != nil {
 		log.Fatalf("❌ Git Error: %v", err)
 	}
@@ -61,14 +59,14 @@ func aiTest() {
 }
 
 func gitTest() {
-	gitDiff := git.BuildGitSummary()
+	gitDiff := git.BuildGitSummary(3)
 	fmt.Println("--- Git Summary ---")
 	fmt.Println(gitDiff)
 }
 
 func UITest() {
 	// 1. Get the staged diff
-	raw, err := git.GetStagedDiff()
+	raw, err := git.GetStagedDiff(5)
 	if err != nil {
 		log.Fatalf("❌ Git Error: %v", err)
 	}

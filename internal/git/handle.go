@@ -6,11 +6,11 @@ import (
 )
 
 // Build a git diff summary string of what the staged changes look like
-func BuildGitSummary() string {
+func BuildGitSummary(contextWidth int) string {
 	response := ""
 
 	// Fetch raw diff from Git
-	raw, err := GetStagedDiff()
+	raw, err := GetStagedDiff(contextWidth)
 	if err != nil {
 		log.Fatalf("❌ Git Error: %v", err)
 	}
@@ -33,7 +33,7 @@ func BuildGitSummary() string {
 		// TextFragments directly from the file
 		for i, fragment := range f.TextFragments {
 			response += fmt.Sprintf("    Hunk #%d: +%d lines, -%d lines (Starts at line %d) \n",
-				i+1, fragment.NewLines, fragment.OldLines, fragment.NewPosition)
+				i+1, fragment.NewLines, fragment.OldLines, fragment.NewPosition+1)
 
 			// append the actual changes
 			for _, line := range fragment.Lines {

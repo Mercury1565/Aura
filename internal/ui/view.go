@@ -28,15 +28,21 @@ func (m Model) renderDiffContent() string {
 		doc.WriteString(header + "\n")
 
 		for _, hunk := range file.TextFragments {
-			left, right := DiffSideBySide(hunk, m.TerminalWidth)
+			ln, lc, rn, rc := DiffSideBySide(hunk, m.TerminalWidth)
+
+			// Assemble the columns
+			left := lipgloss.JoinHorizontal(lipgloss.Top, ln, lc)
+			right := lipgloss.JoinHorizontal(lipgloss.Top, rn, rc)
 
 			leftWindow := lipgloss.NewStyle().
 				Border(lipgloss.RoundedBorder()).
-				Width(leftWidth).Render(left)
+				Width(leftWidth).
+				Render(left)
 
 			rightWindow := lipgloss.NewStyle().
 				Border(lipgloss.RoundedBorder()).
-				Width(rightWidth).Render(right)
+				Width(rightWidth).
+				Render(right)
 
 			sideBySide := lipgloss.JoinHorizontal(
 				lipgloss.Top,

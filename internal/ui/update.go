@@ -23,8 +23,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.TerminalHeight = msg.Height
 
 		headerHeight := 3
-		footerHeight := 1
-		verticalMarginHeight := headerHeight + footerHeight
+		verticalMarginHeight := headerHeight
 
 		if !m.Ready {
 			m.Viewport = viewport.New(msg.Width, msg.Height-verticalMarginHeight)
