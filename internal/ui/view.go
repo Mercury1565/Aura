@@ -7,7 +7,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// renderDiffContent generates the entire diff as one big string
+// generates the entire diff as one big string
 func (m Model) renderDiffContent() string {
 	var doc strings.Builder
 
@@ -18,7 +18,6 @@ func (m Model) renderDiffContent() string {
 	for _, file := range m.DiffFiles {
 		header := lipgloss.NewStyle().
 			Foreground(Color(ColorHeaderText)).
-			Background(Color(ColorHeaderBackground)).
 			Bold(true).
 			Render(fmt.Sprintf(
 				"\n 📂 %s %s",
@@ -30,8 +29,14 @@ func (m Model) renderDiffContent() string {
 
 		for _, hunk := range file.TextFragments {
 			left, right := DiffSideBySide(hunk, m.TerminalWidth)
-			leftWindow := lipgloss.NewStyle().Width(leftWidth).Render(left)
-			rightWindow := lipgloss.NewStyle().Width(rightWidth).Render(right)
+
+			leftWindow := lipgloss.NewStyle().
+				Border(lipgloss.RoundedBorder()).
+				Width(leftWidth).Render(left)
+
+			rightWindow := lipgloss.NewStyle().
+				Border(lipgloss.RoundedBorder()).
+				Width(rightWidth).Render(right)
 
 			sideBySide := lipgloss.JoinHorizontal(
 				lipgloss.Top,
