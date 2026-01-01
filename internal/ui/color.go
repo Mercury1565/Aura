@@ -12,6 +12,7 @@ const (
 	ColorHeaderText       ColorName = "header"
 	ColorHeaderBackground ColorName = "header_background"
 	ColorLineNumber       ColorName = "line_number"
+	ColorAI               ColorName = "ai"
 )
 
 func Color(name ColorName) lipgloss.Color {
@@ -31,6 +32,8 @@ func Color(name ColorName) lipgloss.Color {
 		return lipgloss.Color("#313244")
 	case ColorLineNumber:
 		return lipgloss.Color("#585B70")
+	case ColorAI:
+		return lipgloss.Color("205")
 
 	default:
 		return lipgloss.Color("#CDD6F4")

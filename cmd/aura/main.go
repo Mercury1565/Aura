@@ -65,6 +65,9 @@ func gitTest() {
 }
 
 func UITest() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	// 1. Get the staged diff
 	raw, err := git.GetStagedDiff(5)
 	if err != nil {
@@ -77,8 +80,18 @@ func UITest() {
 		log.Fatalf("❌ Parser Error: %v", err)
 	}
 
+	_ = godotenv.Load()
+	modelName := os.Getenv("MODEL_NAME")
+
+	llm, err := ai.NewGroqClient(modelName)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	r := reviewer.NewLLMReviewer(llm)
+
 	// 3. Initialize the UI Model with the files
-	m := ui.InitialModel(files)
+	m := ui.InitialModel(files, r, ctx)
 
 	// 4. Start the Bubble Tea program
 	p := tea.NewProgram(m, tea.WithAltScreen()) // WithAltScreen is the "IDE" feel

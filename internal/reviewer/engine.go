@@ -2,6 +2,8 @@ package reviewer
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/Mercury1565/Aura/internal/ai"
@@ -50,7 +52,7 @@ func (r *LLMReviewer) ReviewDiff(ctx context.Context, files []*gitdiff.File) (st
 	return builder.String(), nil
 }
 
-func (r *LLMReviewer) ReviewDiffWithStructuredOutput(ctx context.Context, files []*gitdiff.File) (string, error) {
+func (r *LLMReviewer) ReviewDiffWithStructuredOutput(ctx context.Context, files []*gitdiff.File) (*CodeReview, error) {
 	prompt := ai.BuildPrompt(files, true)
 
 	req := ai.ChatRequest{
@@ -67,8 +69,13 @@ func (r *LLMReviewer) ReviewDiffWithStructuredOutput(ctx context.Context, files 
 
 	jsonResponse, err := r.llm.ChatStructured(ctx, req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	return jsonResponse, nil
+	var review CodeReview
+	if err := json.Unmarshal([]byte(jsonResponse), &review); err != nil {
+		return nil, fmt.Errorf("invalid structured LLM response: %w", err)
+	}
+
+	return &review, nil
 }

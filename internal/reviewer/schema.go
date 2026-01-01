@@ -1,5 +1,19 @@
 package reviewer
 
+type CodeReview struct {
+	Summary string       `json:"summary"`
+	Reviews []ReviewItem `json:"reviews"`
+}
+
+type ReviewItem struct {
+	File       string `json:"file"`
+	Line       int    `json:"line"`
+	Type       string `json:"type"`
+	Detail     string `json:"detail"`
+	Suggestion string `json:"suggestion"`
+	AuraLoss   int    `json:"aura_loss"`
+}
+
 func GetAuraSchema() map[string]any {
 	return map[string]any{
 		"type": "object",
