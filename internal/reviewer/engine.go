@@ -79,3 +79,59 @@ func (r *LLMReviewer) ReviewDiffWithStructuredOutput(ctx context.Context, files 
 
 	return &review, nil
 }
+
+func (r *LLMReviewer) ParseUnstructuredReview(input string) *CodeReview {
+	var feedback CodeReview
+	// Split by the horizontal rule
+	blocks := strings.Split(input, "---")
+
+	for _, block := range blocks {
+		block = strings.TrimSpace(block)
+		if block == "" {
+			continue
+		}
+
+		item := ReviewItem{}
+		lines := strings.Split(block, "\n")
+
+		for _, line := range lines {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+
+			// Simple key-value split by the first ":"
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) < 2 {
+				continue
+			}
+
+			key := strings.TrimSpace(parts[0])
+			val := strings.TrimSpace(parts[1])
+
+			switch key {
+			case "ISSUE":
+				item.Issue = val
+			case "FILE":
+				item.File = val
+			case "TYPE":
+				item.Type = val
+			case "DETAIL":
+				item.Issue = val
+			case "SUGGESTION":
+				item.Suggestion = val
+			case "LINE":
+				fmt.Sscanf(val, "%d", &item.Line)
+			case "AURA_LOSS":
+				fmt.Sscanf(val, "%f", &item.AuraLoss)
+			}
+		}
+
+		if item.Issue != "" {
+			feedback.Reviews = append(feedback.Reviews, item)
+		}
+	}
+
+	feedback.Summary = fmt.Sprintf("Found %d issues via fallback review.", len(feedback.Reviews))
+	return &feedback
+}

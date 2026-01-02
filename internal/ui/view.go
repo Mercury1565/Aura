@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Mercury1565/Aura/internal/reviewer"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -15,13 +16,23 @@ func (m Model) renderDiffContent() string {
 	columnWidth := 4 * contentWidth / 10
 	aiWindowWidth := contentWidth / 5
 
-	// Get feedback once per render
-	feedback, err := m.Reviewer.ReviewDiffWithStructuredOutput(m.Ctx, m.DiffFiles)
+	var feedback *reviewer.CodeReview
+	var err error
+
+	// Try Structured First
+	feedback, err = m.Reviewer.ReviewDiffWithStructuredOutput(m.Ctx, m.DiffFiles)
+
 	if err != nil {
-		return "AI Review failed: " + err.Error()
+		// Fallback to Unstructured
+		rawText, fallbackErr := m.Reviewer.ReviewDiff(m.Ctx, m.DiffFiles)
+		if fallbackErr != nil {
+			return "Critical Error: Both review methods failed."
+		}
+		feedback = m.Reviewer.ParseUnstructuredReview(rawText)
+		feedback.Summary = "[FALLBACK MODE] " + feedback.Summary
 	}
 
-	// AI Summary Box (Displayed once for the entire diff)
+	// Now the rest of your UI logic works identically for both sources
 	summaryBox := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder(), false, false, true, false).
 		BorderForeground(Color(ColorLineNumber)).
@@ -56,7 +67,7 @@ func (m Model) renderDiffContent() string {
 						Foreground(Color(ColorAI)).
 						Italic(true).
 						Width(aiWindowWidth - 4).
-						Render(fmt.Sprintf("📍 Line %d: %s\n  🚀%s", rev.Line, rev.Detail, rev.Suggestion))
+						Render(fmt.Sprintf("📍 Line %d: %s\n  🚀%s", rev.Line, rev.Issue, rev.Suggestion))
 					hunkFeedback.WriteString(comment + "\n\n")
 				}
 			}
@@ -98,6 +109,7 @@ func (m Model) renderDiffContent() string {
 	}
 	return doc.String()
 }
+
 func (m Model) View() string {
 	if !m.Ready {
 		return "Initializing Aura..."

@@ -9,7 +9,7 @@ type ReviewItem struct {
 	File       string `json:"file"`
 	Line       int    `json:"line"`
 	Type       string `json:"type"`
-	Detail     string `json:"detail"`
+	Issue      string `json:"issue"`
 	Suggestion string `json:"suggestion"`
 	AuraLoss   int    `json:"aura_loss"`
 }
@@ -30,7 +30,7 @@ func GetAuraSchema() map[string]any {
 							"type": "string",
 							"enum": []string{"BUG", "SECURITY", "STYLE", "PERFORMANCE", "COMPLEXITY"},
 						},
-						"detail":     map[string]any{"type": "string"},
+						"issue":      map[string]any{"type": "string"},
 						"suggestion": map[string]any{"type": "string"},
 						"aura_loss": map[string]any{
 							"type":    "integer",

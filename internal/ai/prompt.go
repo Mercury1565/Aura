@@ -7,18 +7,18 @@ import (
 	"github.com/bluekeyes/go-gitdiff/gitdiff"
 )
 
-// BuildPrompt creates the structured XML payload for the LLM
 func BuildPrompt(files []*gitdiff.File, isOutputStructured bool) string {
 	var sb strings.Builder
 
 	if isOutputStructured {
 		sb.WriteString("<instruction>\n")
 		sb.WriteString("Review the following staged changes for logic errors, security issues, and overall code cleanliness.\n")
+		sb.WriteString("Keep your response brief and to the point '+'.\n")
 		sb.WriteString("Only comment on lines prefixed with '+'.\n")
 		sb.WriteString("</instruction>\n\n")
 	} else {
 		sb.WriteString("<instruction>\n")
-		sb.WriteString("Review the following staged changes for logic, security, and 'aura' (cleanliness).\n")
+		sb.WriteString("Review the following staged changes for logic errors, security issues, and overall code cleanliness.\n")
 		sb.WriteString("Only comment on lines prefixed with '+'.\n\n")
 
 		sb.WriteString("### OUTPUT FORMAT\n")
