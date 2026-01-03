@@ -13,10 +13,14 @@ type Model struct {
 	Ctx            context.Context
 	DiffFiles      []*gitdiff.File
 	Reviewer       *reviewer.LLMReviewer
+	ReviewData     *reviewer.CodeReview
+	IsLoading      bool
 	TerminalWidth  int
 	TerminalHeight int
 	Viewport       viewport.Model
 	Ready          bool
+	AIScrollOffset int
+	Error          []error
 }
 
 func InitialModel(
@@ -32,5 +36,5 @@ func InitialModel(
 }
 
 func (m Model) Init() tea.Cmd {
-	return nil
+	return m.FetchReviewCmd()
 }

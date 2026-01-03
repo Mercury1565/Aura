@@ -4,41 +4,33 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Mercury1565/Aura/internal/reviewer"
 	"github.com/charmbracelet/lipgloss"
 )
 
 // generates the entire diff as one big string
 func (m Model) renderDiffContent() string {
+	if len(m.Error) > 0 {
+		return m.renderError()
+	}
+
+	if m.ReviewData == nil {
+		// todo: animated wait visual here
+		return "\n  ✨ Aura is analyzing your changes..."
+	}
+
 	var doc strings.Builder
+	feedback := m.ReviewData
 
 	contentWidth := m.TerminalWidth - 2
 	columnWidth := 4 * contentWidth / 10
 	aiWindowWidth := contentWidth / 5
 
-	var feedback *reviewer.CodeReview
-	var err error
-
-	// Try Structured First
-	feedback, err = m.Reviewer.ReviewDiffWithStructuredOutput(m.Ctx, m.DiffFiles)
-
-	if err != nil {
-		// Fallback to Unstructured
-		rawText, fallbackErr := m.Reviewer.ReviewDiff(m.Ctx, m.DiffFiles)
-		if fallbackErr != nil {
-			return "Critical Error: Both review methods failed."
-		}
-		feedback = m.Reviewer.ParseUnstructuredReview(rawText)
-		feedback.Summary = "[FALLBACK MODE] " + feedback.Summary
-	}
-
-	// Now the rest of your UI logic works identically for both sources
 	summaryBox := lipgloss.NewStyle().
 		Border(lipgloss.NormalBorder(), false, false, true, false).
 		BorderForeground(Color(ColorLineNumber)).
 		Padding(1, 2).
 		Width(m.TerminalWidth).
-		Render(fmt.Sprintf("AI SUMMARY: %s", feedback.Summary))
+		Render(fmt.Sprintf("AI SUMMARY: %s\n", feedback.Summary))
 	doc.WriteString(summaryBox + "\n\n")
 
 	for _, file := range m.DiffFiles {
@@ -54,7 +46,7 @@ func (m Model) renderDiffContent() string {
 		for _, hunk := range file.TextFragments {
 			lNums, lLines, rNums, rLines := DiffSideBySide(hunk, m.TerminalWidth)
 
-			// Filter reviews that belong to THIS hunk
+			// Filter reviews that belong to this hunk
 			var hunkFeedback strings.Builder
 			for _, rev := range feedback.Reviews {
 				line := int64(rev.Line)
@@ -63,19 +55,41 @@ func (m Model) renderDiffContent() string {
 					line >= hunk.NewPosition &&
 					line <= hunk.NewPosition+hunk.NewLines {
 
+					var b strings.Builder
+
+					labelTypeStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponeTag))
+					labelIssueStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponeTag))
+					labelSuggestionStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponeTag))
+					labelAuraStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponeTag))
+					valueStyle := lipgloss.NewStyle().Foreground(Color(ColorAI)).Italic(true)
+
+					b.WriteString(labelTypeStyle.Render("Line: "))
+					b.WriteString(valueStyle.Render(fmt.Sprintf("%d", rev.Line)))
+
+					b.WriteString(labelTypeStyle.Render("\nType: "))
+					b.WriteString(valueStyle.Render(fmt.Sprintf("%s", rev.Type)))
+
+					b.WriteString(labelIssueStyle.Render("\nIssue: "))
+					b.WriteString(valueStyle.Render(fmt.Sprintf("%s", rev.Issue)))
+
+					b.WriteString(labelSuggestionStyle.Render("\nSuggestion: "))
+					b.WriteString(valueStyle.Render(fmt.Sprintf("%s", rev.Suggestion)))
+
+					b.WriteString(labelAuraStyle.Render("\nAura Loss: "))
+					b.WriteString(valueStyle.Render(fmt.Sprintf("%d", rev.AuraLoss)))
+
 					comment := lipgloss.NewStyle().
-						Foreground(Color(ColorAI)).
-						Italic(true).
 						Width(aiWindowWidth - 4).
-						Render(fmt.Sprintf("📍 Line %d: %s\n  🚀%s", rev.Line, rev.Issue, rev.Suggestion))
+						Render(b.String())
+
 					hunkFeedback.WriteString(comment + "\n\n")
 				}
 			}
 
-			// Assemble the windows
 			innerWidth := columnWidth - 2
 			aiText := hunkFeedback.String()
 
+			// Assemble the windows
 			leftContent := lipgloss.NewStyle().
 				Width(innerWidth).
 				Render(
@@ -97,17 +111,76 @@ func (m Model) renderDiffContent() string {
 				Width(columnWidth).
 				Render(rightContent)
 
+			// determine the actual height of the code hunk
+			leftHeight := lipgloss.Height(leftWindow)
+			rightHeight := lipgloss.Height(rightWindow)
+			maxCodeHeight := max(leftHeight, rightHeight)
+
+			// prepare AI text with internal scrolling
+			aiLines := strings.Split(aiText, "\n")
+			displayLimit := maxCodeHeight - 2
+
+			var finalAIText string
+			if len(aiLines) > displayLimit {
+				// Use the global offset
+				start := m.AIScrollOffset
+				if start > len(aiLines)-displayLimit {
+					start = len(aiLines) - displayLimit
+				}
+				if start < 0 {
+					start = 0
+				}
+
+				end := start + displayLimit
+				finalAIText = strings.Join(aiLines[start:end], "\n")
+				finalAIText += "\n" + lipgloss.NewStyle().Foreground(Color(ColorAIScroll)).Render("↓ more...")
+			} else {
+				finalAIText = aiText
+			}
+
+			// Force AI Window to match code height exactly
 			aiWindow := lipgloss.NewStyle().
-				Padding(2, 1).
+				Border(lipgloss.RoundedBorder()).
 				BorderForeground(Color(ColorLineNumber)).
 				Width(aiWindowWidth).
-				Render(aiText)
+				Height(maxCodeHeight).
+				Render(finalAIText)
 
 			sideBySide := lipgloss.JoinHorizontal(lipgloss.Top, leftWindow, aiWindow, rightWindow)
 			doc.WriteString(sideBySide + "\n")
 		}
 	}
 	return doc.String()
+}
+
+func (m Model) renderError() string {
+	var b strings.Builder
+
+	for _, err := range m.Error {
+		if err == nil {
+			continue
+		}
+		b.WriteString("• ")
+		b.WriteString(err.Error())
+		b.WriteString("\n")
+	}
+
+	errorText := strings.TrimSpace(b.String())
+	if errorText == "" {
+		errorText = "Unknown error occurred."
+	}
+
+	errorBox := lipgloss.NewStyle().
+		Border(lipgloss.RoundedBorder()).
+		BorderForeground(Color(ColorRemoved)).
+		Foreground(Color(ColorRemoved)).
+		Padding(1, 2).
+		Width(m.TerminalWidth).
+		Render(
+			"☠️ ☠️ AI Review Failed ☠️ ☠️\n\n" + errorText,
+		)
+
+	return "\n" + errorBox
 }
 
 func (m Model) View() string {
@@ -123,5 +196,5 @@ func (m Model) View() string {
 }
 
 func (m Model) headerView() string {
-	return lipgloss.NewStyle().Bold(true).Render(" AURA GIT DIFF VIEW (q to quit)")
+	return lipgloss.NewStyle().Bold(true).Render(" AURA GIT DIFF VIEW (q to quit) (scroll shift+up/shift+down)")
 }

@@ -94,7 +94,7 @@ func UITest() {
 	m := ui.InitialModel(files, r, ctx)
 
 	// 4. Start the Bubble Tea program
-	p := tea.NewProgram(m, tea.WithAltScreen()) // WithAltScreen is the "IDE" feel
+	p := tea.NewProgram(m, tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Alas, there's been an error: %v", err)
 		os.Exit(1)

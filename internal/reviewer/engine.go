@@ -82,19 +82,17 @@ func (r *LLMReviewer) ReviewDiffWithStructuredOutput(ctx context.Context, files 
 
 func (r *LLMReviewer) ParseUnstructuredReview(input string) *CodeReview {
 	var feedback CodeReview
-	// Split by the horizontal rule
-	blocks := strings.Split(input, "---")
 
-	for _, block := range blocks {
+	// Split by the horizontal rule
+	for block := range strings.SplitSeq(input, "---") {
 		block = strings.TrimSpace(block)
 		if block == "" {
 			continue
 		}
 
 		item := ReviewItem{}
-		lines := strings.Split(block, "\n")
 
-		for _, line := range lines {
+		for line := range strings.SplitSeq(block, "\n") {
 			line = strings.TrimSpace(line)
 			if line == "" {
 				continue
