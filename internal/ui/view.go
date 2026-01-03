@@ -15,7 +15,23 @@ func (m Model) renderDiffContent() string {
 
 	if m.ReviewData == nil {
 		// todo: animated wait visual here
-		return "\n  ✨ Aura is analyzing your changes..."
+		logo := m.auraLogo()
+
+		tagline := lipgloss.NewStyle().
+			Foreground(lipgloss.Color("242")).
+			Render("Observing code patterns...")
+
+		// Stack logo and tagline
+		content := lipgloss.JoinVertical(lipgloss.Center, logo, tagline)
+
+		// Perfect center placement
+		return lipgloss.Place(
+			m.TerminalWidth,
+			m.TerminalHeight-3,
+			lipgloss.Center,
+			lipgloss.Center,
+			content,
+		)
 	}
 
 	var doc strings.Builder
@@ -181,6 +197,25 @@ func (m Model) renderError() string {
 		)
 
 	return "\n" + errorBox
+}
+
+func (m Model) auraLogo() string {
+	logo := `
+	 ___       ___                ___        ____     ___
+    /   |     /\  \              /\  \      / __ \   /\  \
+   / /| |    /::\  \            /::\  \    / /_/ /  /::\  \
+  / / | |   /:/\:\__\  __  __  /:/\:\__\  / / __/  /:/\:\__\  ___
+ --------  /:/ /:/  / / / / / /:/ /:/  / / / | |  /:/ /:/  / /   |
+/ /   | | /:/_/:/  / / / / / /:/_/:/  / / /  | | /:/_/:/  / / /| |
+          \:\/:/  / / / / /  \:\/:/  /           \:\/:/  / / / | |
+           \::/  / / /_/ /    \::/  /             \::/  / --------
+            \/__/  \____/      \/__/               \/__/ / /   | |`
+
+	colorIndex := m.Frame % len(shimmerColors)
+	return lipgloss.NewStyle().
+		Foreground(lipgloss.Color(shimmerColors[colorIndex])).
+		Bold(true).
+		Render(logo)
 }
 
 func (m Model) View() string {

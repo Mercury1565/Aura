@@ -45,3 +45,27 @@ func Color(name ColorName) lipgloss.Color {
 		return lipgloss.Color("#CDD6F4") // default foreground
 	}
 }
+
+var shimmerColors = []string{
+	"57",  // deep purple
+	"63",  // violet
+	"93",  // magenta
+	"129", // pink
+	"165", // hot pink
+	"201", // bright pink
+	"207", // light pink
+	"199", // neon pink
+	"163", // orange-pink
+	"208", // bright orange
+	"214", // yellow-orange
+	"220", // bright yellow
+	"226", // yellow
+	"190", // lime
+	"118", // green
+	"82",  // bright green
+	"45",  // cyan
+	"39",  // bright cyan
+	"33",  // blue
+	"27",  // deep blue
+	"93",  // magenta again for bounce
+}
