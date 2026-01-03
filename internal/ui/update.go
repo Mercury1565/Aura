@@ -1,10 +1,14 @@
 package ui
 
 import (
+	"time"
+
 	"github.com/Mercury1565/Aura/internal/reviewer"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
 )
+
+type tickMsg time.Time
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var (
@@ -13,6 +17,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	)
 
 	switch msg := msg.(type) {
+	case tickMsg:
+		m.Frame++
+		m.Viewport.SetContent(m.renderDiffContent())
+		return m, m.tickCmd() // Continue the pulse
+
 	case []error:
 		m.Error = msg
 		m.IsLoading = false
@@ -89,4 +98,11 @@ func (m Model) FetchReviewCmd() tea.Cmd {
 		}
 		return feedback
 	}
+}
+
+// Helper to trigger the next frame every 100ms
+func (m Model) tickCmd() tea.Cmd {
+	return tea.Tick(time.Millisecond*100, func(t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
 }

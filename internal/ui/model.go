@@ -21,6 +21,7 @@ type Model struct {
 	Ready          bool
 	AIScrollOffset int
 	Error          []error
+	Frame          int
 }
 
 func InitialModel(
@@ -36,5 +37,8 @@ func InitialModel(
 }
 
 func (m Model) Init() tea.Cmd {
-	return m.FetchReviewCmd()
+	return tea.Batch(
+		m.FetchReviewCmd(),
+		m.tickCmd(),
+	)
 }

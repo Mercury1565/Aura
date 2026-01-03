@@ -14,8 +14,7 @@ func (m Model) renderDiffContent() string {
 	}
 
 	if m.ReviewData == nil {
-		// todo: animated wait visual here
-		return "\n  ✨ Aura is analyzing your changes..."
+		return m.renderLoading()
 	}
 
 	var doc strings.Builder
@@ -177,10 +176,46 @@ func (m Model) renderError() string {
 		Padding(1, 2).
 		Width(m.TerminalWidth).
 		Render(
-			"☠️ ☠️ AI Review Failed ☠️ ☠️\n\n" + errorText,
+			"☠️ ☠️ AI FAILURE ON BOTH STRUCTURED AND UNSTRUCTURED OUTPUT ☠️ ☠️\n\n" + errorText,
 		)
 
 	return "\n" + errorBox
+}
+
+func (m Model) renderLoading() string {
+	auraLogo := `
+	 ___       ___                ___        ____     ___
+    /   |     /\  \              /\  \      / __ \   /\  \
+   / /| |    /::\  \            /::\  \    / /_/ /  /::\  \
+  / / | |   /:/\:\__\  __  __  /:/\:\__\  / / __/  /:/\:\__\  ___
+ --------  /:/ /:/  / / / / / /:/ /:/  / / / | |  /:/ /:/  / /   |
+/ /   | | /:/_/:/  / / / / / /:/_/:/  / / /  | | /:/_/:/  / / /| |
+          \:\/:/  / / / / /  \:\/:/  /           \:\/:/  / / / | |
+           \::/  / / /_/ /    \::/  /             \::/  / --------
+            \/__/  \____/      \/__/               \/__/ / /   | |`
+
+	colorIndex := m.Frame % len(logoShimmerColors)
+
+	logo := lipgloss.NewStyle().
+		Foreground(lipgloss.Color(logoShimmerColors[colorIndex])).
+		Bold(true).
+		Render(auraLogo)
+
+	tagline := lipgloss.NewStyle().
+		Foreground(Color(ColorLoadingText)).
+		Render("Analyzing your code...")
+
+	// Stack logo and tagline
+	content := lipgloss.JoinVertical(lipgloss.Center, logo, tagline)
+
+	// Perfect center placement
+	return lipgloss.Place(
+		m.TerminalWidth,
+		m.TerminalHeight-3,
+		lipgloss.Center,
+		lipgloss.Center,
+		content,
+	)
 }
 
 func (m Model) View() string {
