@@ -54,14 +54,14 @@ var logoShimmerColors = []string{
 	"63",  // violet
 	"93",  // magenta
 	"129", // pink
+	"207", // light pink
 	"165", // hot pink
 	"201", // bright pink
-	"207", // light pink
 	"199", // neon pink
 	"163", // orange-pink
+	"220", // bright yellow
 	"208", // bright orange
 	"214", // yellow-orange
-	"220", // bright yellow
 	"226", // yellow
 	"190", // lime
 	"118", // green
