@@ -38,7 +38,7 @@ func GetAuraSchema() map[string]any {
 							"maximum": 10000,
 						},
 					},
-					"required":             []string{"file", "line", "type", "detail", "suggestion", "aura_loss"},
+					"required":             []string{"file", "line", "type", "issue", "suggestion", "aura_loss"},
 					"additionalProperties": false,
 				},
 			},

@@ -16,6 +16,11 @@ const (
 	ColorAI               ColorName = "ai"
 	ColorAIResponeTag     ColorName = "ai_response_tags"
 	ColorAIScroll         ColorName = "ai_scroll"
+	ColorAuraLogo         ColorName = "aura_logo"
+	ColorType             ColorName = "type"
+	ColorIssue            ColorName = "issue"
+	ColorSuggestion       ColorName = "suggestion"
+	ColorAuraLoss         ColorName = "aura_loss"
 )
 
 func Color(name ColorName) lipgloss.Color {
@@ -43,6 +48,18 @@ func Color(name ColorName) lipgloss.Color {
 		return lipgloss.Color("10") // bright green
 	case ColorAIScroll:
 		return lipgloss.Color("#89DCEB") // cyan
+
+	// for preety print
+	case ColorAuraLogo:
+		return lipgloss.Color("205") // bright pink
+	case ColorType:
+		return lipgloss.Color("220") // bright yellow
+	case ColorIssue:
+		return lipgloss.Color("196") // bright red
+	case ColorSuggestion:
+		return lipgloss.Color("82") // bright yellow
+	case ColorAuraLoss:
+		return lipgloss.Color("214") // orange
 
 	default:
 		return lipgloss.Color("#CDD6F4") // default foreground

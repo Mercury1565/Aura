@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -14,7 +15,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func aiTest() {
+func detachedModeTest() {
 	ctx := context.Background()
 
 	_ = godotenv.Load()
@@ -26,15 +27,6 @@ func aiTest() {
 	}
 
 	r := reviewer.NewLLMReviewer(llm)
-
-	// diff := `
-	// 		--- a/main.go
-	// 		+++ b/main.go
-	// 		@@ -10,5 +10,6 @@ func main() {
-	// 		- apiKey := "AIza_Secret_Key_123"
-	// 		+ apiKey := os.Getenv("API_KEY")
-	// 		+ fmt.Println("Debugging here...")
-	// 	`
 
 	// Fetch raw diff from Git
 	raw, err := git.GetStagedDiff(3)
@@ -48,14 +40,19 @@ func aiTest() {
 		log.Fatalf("❌ Parser Error: %v", err)
 	}
 
-	feedback, err := r.ReviewDiff(ctx, files)
-	// feedback, err := r.ReviewDiffWithStructuredOutput(ctx, files)
-	if err != nil {
-		log.Fatal(err)
+	feedback, err := r.ReviewDiffWithStructuredOutput(ctx, files)
+	if err != nil || feedback == nil || len(feedback.Reviews) == 0 {
+		// Fallback
+		fmt.Println("Falling back to unstructured review...")
+		raw, fallbackErr := r.ReviewDiff(ctx, files)
+		if fallbackErr != nil {
+			log.Fatalf("❌ Fallback Error: %v", fallbackErr)
+		}
+
+		feedback = r.ParseUnstructuredReview(raw)
 	}
 
-	fmt.Println("🚀🚀🚀--- LLM Review ---🚀🚀🚀")
-	fmt.Println(feedback)
+	feedback.PrettyPrint()
 }
 
 func gitTest() {
@@ -102,7 +99,12 @@ func UITest() {
 }
 
 func main() {
-	// aiTest()
-	// gitTest()
-	UITest()
+	detachedMode := flag.Bool("d", false, "detached mode")
+	flag.Parse()
+
+	if *detachedMode {
+		detachedModeTest()
+	} else {
+		UITest()
+	}
 }

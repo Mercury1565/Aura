@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/Mercury1565/Aura/internal/ai"
@@ -77,6 +78,11 @@ func (r *LLMReviewer) ReviewDiffWithStructuredOutput(ctx context.Context, files 
 		return nil, fmt.Errorf("invalid structured LLM response: %w", err)
 	}
 
+	// Sort reviews by AuraLoss descending (highest first)
+	slices.SortFunc(review.Reviews, func(a, b ReviewItem) int {
+		return b.AuraLoss - a.AuraLoss
+	})
+
 	return &review, nil
 }
 
@@ -108,20 +114,18 @@ func (r *LLMReviewer) ParseUnstructuredReview(input string) *CodeReview {
 			val := strings.TrimSpace(parts[1])
 
 			switch key {
-			case "ISSUE":
-				item.Issue = val
 			case "FILE":
 				item.File = val
+			case "LINE":
+				fmt.Sscanf(val, "%d", &item.Line)
 			case "TYPE":
 				item.Type = val
-			case "DETAIL":
+			case "ISSUE":
 				item.Issue = val
 			case "SUGGESTION":
 				item.Suggestion = val
-			case "LINE":
-				fmt.Sscanf(val, "%d", &item.Line)
 			case "AURA_LOSS":
-				fmt.Sscanf(val, "%f", &item.AuraLoss)
+				fmt.Sscanf(val, "%d", &item.AuraLoss)
 			}
 		}
 
