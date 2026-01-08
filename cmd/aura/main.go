@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	_ "embed"
 	"flag"
 	"fmt"
 	"log"
@@ -14,6 +15,9 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/joho/godotenv"
 )
+
+//go:embed help.txt
+var helpContent string
 
 func detachedModeTest() {
 	ctx := context.Background()
@@ -99,10 +103,14 @@ func UITest() {
 }
 
 func main() {
-	detachedMode := flag.Bool("d", false, "detached mode")
+	dryMode := flag.Bool("d", false, "dry mode")
+	flag.Usage = func() {
+		fmt.Print(helpContent)
+	}
+
 	flag.Parse()
 
-	if *detachedMode {
+	if *dryMode {
 		detachedModeTest()
 	} else {
 		UITest()

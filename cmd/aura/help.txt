@@ -1,0 +1,27 @@
+================================================================================
+                    AURA - AI-Powered Code Reviewer
+================================================================================
+
+Refine your code. Keep your dignity :).
+
+USAGE:
+  aura [flags]
+
+FLAGS:
+  -d, --dry        Dry run: Prints a prioritized summary to console and exits.
+  -m, --model      Specify the LLM model name (default: from .env). [COMING SOON]
+  -v, --version    Show current version of Aura. [COMING SOON]
+  -h, --help       Show this help menu.
+
+CONTROLS (TUI):
+  q, ctrl+c        Quit Aura
+  ↑ / ↓            Scroll through the diff view
+  shift + ↑ / ↓    Scroll internal AI feedback columns
+  pgup / pgdn      Jump scroll diff view [COMING SOON]
+
+EGO PROTECTION:
+  Use Aura to catch the 3:00 AM logic before it becomes a
+  judgmental PR comment.
+
+  "Code is your signature. Don't leave a messy one."
+================================================================================
