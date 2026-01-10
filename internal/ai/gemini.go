@@ -3,9 +3,7 @@ package ai
 import (
 	"context"
 	"fmt"
-	"os"
 
-	"github.com/joho/godotenv"
 	"google.golang.org/genai"
 )
 
@@ -14,10 +12,8 @@ type GeminiClient struct {
 	model  string
 }
 
-func NewGeminiClient(ctx context.Context, model string) (*GeminiClient, error) {
-	_ = godotenv.Load()
-
-	apiKey := os.Getenv("GEMINI_API_KEY")
+func NewGeminiClient(ctx context.Context, model string, c *Config) (*GeminiClient, error) {
+	apiKey := c.GeminiAPIKey
 	if apiKey == "" {
 		return nil, fmt.Errorf("GEMINI_API_KEY not set")
 	}

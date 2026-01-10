@@ -37,13 +37,18 @@ cd Aura
 go build -o aura ./cmd/aura
 ```
 
-### 2. Environment Setup
+### 2. Configuration
 
-Create a `.env` file in the root directory:
+Aura stores your settings in `~/.config/aura/config.yaml`. You can set them directly from the CLI without opening an editor. Here is a working example using the working setup with the [Groq API provider](https://groq.com/):
 
-```env
-GROQ_API_KEY=your_key_here
-MODEL_NAME=llama-3.3-70b-versatile
+#### Set your API Key
+```bash
+./aura config groq_api_key "your_groq_api_key_here"
+```
+
+#### Set your preferred model
+```bash
+./aura config model_name "llama-3.3-70b-versatile"
 ```
 
 ### 3. Usage
@@ -54,9 +59,21 @@ Review your currently staged changes:
 # Launch the full interactive TUI
 ./aura
 
-# Detached-run: print issues to console
+# Prints a prioritized summary to console and exits (one of the two below)
 ./aura -d
+./aura --dry
 
+# Check where your config is stored (one of the two below)
+./aura -w
+./aura --where
+
+# See the model name (one of the two below)
+./aura -m
+./aura --model
+
+# Get help (one of the two below)
+./aura -h
+./aura --help
 ```
 
 ---

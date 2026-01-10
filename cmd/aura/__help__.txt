@@ -6,12 +6,30 @@ Refine your code. Keep your dignity :).
 
 USAGE:
   aura [flags]
+  aura config <key> <value>
+
+COMMANDS:
+  config           Update your settings (e.g., aura config groq_api_key "key")
 
 FLAGS:
   -d, --dry        Dry run: Prints a prioritized summary to console and exits.
-  -m, --model      Specify the LLM model name (default: from .env). [COMING SOON]
+  -m, --model      Show the LLM model name.
   -v, --version    Show current version of Aura. [COMING SOON]
   -h, --help       Show this help menu.
+  -w, --where      Show config file path.
+
+CONFIGURATION:
+  You must set your API key before the first run.
+  Key names available:
+    groq_api_key   Your Groq Cloud API Key
+    model_name     The LLM to use (e.g., llama-3.3-70b-versatile)
+
+  Example:
+    aura config groq_api_key "gsk_1234abcd..."
+    aura config model_name "openai/gpt-oss-120b"
+
+  Other Method:
+    You can also edit the config file directly at ~/.config/aura/config.yaml
 
 CONTROLS (TUI):
   q, ctrl+c        Quit Aura

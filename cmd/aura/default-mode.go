@@ -11,29 +11,26 @@ import (
 	"github.com/Mercury1565/Aura/internal/reviewer"
 	"github.com/Mercury1565/Aura/internal/ui"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/joho/godotenv"
 )
 
-func DefaultMode() {
+func DefaultMode(cfg *ai.Config) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// 1. Get the staged diff
 	raw, err := git.GetStagedDiff(5)
 	if err != nil {
-		log.Fatalf("❌ Git Error: %v", err)
+		log.Fatalf("Git Error: %v", err)
 	}
 
 	// 2. Parse it into structs
 	files, err := git.ParseRawDiff(raw)
 	if err != nil {
-		log.Fatalf("❌ Parser Error: %v", err)
+		log.Fatalf("Parser Error: %v", err)
 	}
 
-	_ = godotenv.Load()
-	modelName := os.Getenv("MODEL_NAME")
-
-	llm, err := ai.NewGroqClient(modelName)
+	modelName := cfg.ModelName
+	llm, err := ai.NewGroqClient(modelName, cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

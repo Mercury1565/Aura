@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 
-	"github.com/joho/godotenv"
 	openai "github.com/sashabaranov/go-openai"
 )
 
@@ -15,10 +13,8 @@ type GroqClient struct {
 	model  string
 }
 
-func NewGroqClient(model string) (*GroqClient, error) {
-	_ = godotenv.Load()
-
-	apiKey := os.Getenv("GROQ_API_KEY")
+func NewGroqClient(model string, c *Config) (*GroqClient, error) {
+	apiKey := c.GroqAPIKey
 	if apiKey == "" {
 		return nil, fmt.Errorf("GROQ_API_KEY not set")
 	}

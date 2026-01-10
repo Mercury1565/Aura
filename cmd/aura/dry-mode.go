@@ -4,21 +4,17 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/Mercury1565/Aura/internal/ai"
 	"github.com/Mercury1565/Aura/internal/git"
 	"github.com/Mercury1565/Aura/internal/reviewer"
-	"github.com/joho/godotenv"
 )
 
-func DryMode() {
+func DryMode(cfg *ai.Config) {
 	ctx := context.Background()
+	modelName := cfg.ModelName
 
-	_ = godotenv.Load()
-	modelName := os.Getenv("MODEL_NAME")
-
-	llm, err := ai.NewGroqClient(modelName)
+	llm, err := ai.NewGroqClient(modelName, cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
