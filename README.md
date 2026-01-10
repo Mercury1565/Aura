@@ -34,7 +34,7 @@ Ensure you have Go 1.21+ installed.
 ```bash
 git clone [https://github.com/Mercury1565/Aura.git](https://github.com/Mercury1565/Aura.git)
 cd Aura
-go build -o aura cmd/aura/main.go
+go build -o aura ./cmd/aura
 ```
 
 ### 2. Environment Setup
