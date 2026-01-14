@@ -13,12 +13,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-func DefaultMode(cfg *ai.Config) {
+func DefaultMode(cfg *ai.Config, contextLines int, staged bool) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// 1. Get the staged diff
-	raw, err := git.GetStagedDiff(5)
+	raw, err := git.GetStagedDiff(contextLines, staged)
 	if err != nil {
 		log.Fatalf("Git Error: %v", err)
 	}

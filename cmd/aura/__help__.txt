@@ -12,11 +12,13 @@ COMMANDS:
   config           Update your settings (e.g., aura config groq_api_key "key")
 
 FLAGS:
-  -d, --dry        Dry run: Prints a prioritized summary to console and exits.
-  -m, --model      Show the LLM model name.
-  -v, --version    Show current version of Aura. [COMING SOON]
-  -h, --help       Show this help menu.
-  -w, --where      Show config file path.
+  -d, --dry          Dry run: Prints a prioritized summary to console and exits.
+  -c, --context <n>  Number of context lines (default: 3)
+  -a, --all          Review all changes (including unstaged)
+  -m, --model        Show the LLM model name.
+  -v, --version      Show current version of Aura. [COMING SOON]
+  -h, --help         Show this help menu.
+  -w, --where        Show config file path.
 
 CONFIGURATION:
   You must set your API key before the first run.

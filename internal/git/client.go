@@ -7,12 +7,18 @@ import (
 )
 
 // returns the raw unified diff of staged changes
-func GetStagedDiff(contextWidth int) (string, error) {
+func GetStagedDiff(contextWidth int, staged bool) (string, error) {
 	// this defines the contest width of the git diff extracted
 	// for example: --unified=3 provides 3 lines of context around changes
 	contextDefinition := fmt.Sprintf("--unified=%d", contextWidth)
 
-	cmd := exec.Command("git", "diff", "--cached", contextDefinition)
+	var cmd *exec.Cmd
+	if staged {
+		cmd = exec.Command("git", "diff", "--cached", contextDefinition)
+	} else {
+		cmd = exec.Command("git", "diff", contextDefinition)
+	}
+
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr

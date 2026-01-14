@@ -25,12 +25,14 @@ func (m Model) renderDiffContent() string {
 	aiWindowWidth := contentWidth / 5
 
 	summaryBox := lipgloss.NewStyle().
-		Border(lipgloss.NormalBorder(), false, false, true, false).
+		Border(lipgloss.NormalBorder(), true, false, true, false).
 		BorderForeground(Color(ColorLineNumber)).
-		Padding(1, 2).
+		Foreground(Color(ColorHeaderText)).
+		Padding(1, 1).
+		Align(lipgloss.Center).
 		Width(m.TerminalWidth).
-		Render(fmt.Sprintf("AI SUMMARY: %s\n", feedback.Summary))
-	doc.WriteString(summaryBox + "\n\n")
+		Render(feedback.Summary)
+	doc.WriteString(summaryBox + "\n")
 
 	for _, file := range m.DiffFiles {
 		// File Header
@@ -56,17 +58,25 @@ func (m Model) renderDiffContent() string {
 
 					var b strings.Builder
 
-					labelTypeStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponeTag))
-					labelIssueStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponeTag))
-					labelSuggestionStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponeTag))
-					labelAuraStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponeTag))
+					labelAuraStyle := lipgloss.NewStyle().
+					    Foreground(Color(ColorIssue)).
+					    Bold(true).
+					    Align(lipgloss.Center).
+					    Width(aiWindowWidth - 4)
+
+					labelTypeStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponseTag))
+					labelIssueStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponseTag))
+					labelSuggestionStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponseTag))
+					typeValueStyle := lipgloss.NewStyle().Foreground(Color(ColorHeaderText))
 					valueStyle := lipgloss.NewStyle().Foreground(Color(ColorAI)).Italic(true)
 
-					b.WriteString(labelTypeStyle.Render("Line: "))
+					b.WriteString(labelAuraStyle.Render(fmt.Sprintf("-%d %s", rev.AuraLoss, "AURA LOSS")))
+
+					b.WriteString(labelTypeStyle.Render("\nLine: "))
 					b.WriteString(valueStyle.Render(fmt.Sprintf("%d", rev.Line)))
 
 					b.WriteString(labelTypeStyle.Render("\nType: "))
-					b.WriteString(valueStyle.Render(fmt.Sprintf("%s", rev.Type)))
+					b.WriteString(typeValueStyle.Render(fmt.Sprintf("%s", rev.Type)))
 
 					b.WriteString(labelIssueStyle.Render("\nIssue: "))
 					b.WriteString(valueStyle.Render(fmt.Sprintf("%s", rev.Issue)))
@@ -74,14 +84,17 @@ func (m Model) renderDiffContent() string {
 					b.WriteString(labelSuggestionStyle.Render("\nSuggestion: "))
 					b.WriteString(valueStyle.Render(fmt.Sprintf("%s", rev.Suggestion)))
 
-					b.WriteString(labelAuraStyle.Render("\nAura Loss: "))
-					b.WriteString(valueStyle.Render(fmt.Sprintf("%d", rev.AuraLoss)))
+					// 3. Create the divider line
+					divider := lipgloss.NewStyle().
+					    Foreground(Color(ColorLineNumber)).
+					    Faint(true).
+					    Render(strings.Repeat("─", aiWindowWidth-4))
 
 					comment := lipgloss.NewStyle().
 						Width(aiWindowWidth - 4).
 						Render(b.String())
 
-					hunkFeedback.WriteString(comment + "\n\n")
+					hunkFeedback.WriteString(comment + divider + "\n")
 				}
 			}
 
@@ -231,5 +244,24 @@ func (m Model) View() string {
 }
 
 func (m Model) headerView() string {
-	return lipgloss.NewStyle().Bold(true).Render(" AURA GIT DIFF VIEW (q to quit) (scroll shift+up/shift+down)")
+    if m.TerminalWidth == 0 {
+        return ""
+    }
+
+    headerStyle := lipgloss.NewStyle().
+        Bold(true).
+        Foreground(lipgloss.Color(Color(ColorAIResponseTag))).
+        Align(lipgloss.Center).
+        Width(m.TerminalWidth).
+        Height(2)
+
+    title := "[A]-[U]-[R]-[A]"
+
+    instructions := lipgloss.NewStyle().
+        Faint(true).
+        Bold(false).
+        Foreground(lipgloss.Color(Color(ColorAI))).
+        Render("[q: quit | shift+↑/↓: scroll feedback]")
+
+    return headerStyle.Render(title + "\n" + instructions)
 }

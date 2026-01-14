@@ -10,7 +10,7 @@ import (
 	"github.com/Mercury1565/Aura/internal/reviewer"
 )
 
-func DryMode(cfg *ai.Config) {
+func DryMode(cfg *ai.Config, contextLines int, staged bool) {
 	ctx := context.Background()
 	modelName := cfg.ModelName
 
@@ -22,7 +22,7 @@ func DryMode(cfg *ai.Config) {
 	r := reviewer.NewLLMReviewer(llm)
 
 	// Fetch raw diff from Git
-	raw, err := git.GetStagedDiff(3)
+	raw, err := git.GetStagedDiff(contextLines, staged)
 	if err != nil {
 		log.Fatalf("❌ Git Error: %v", err)
 	}

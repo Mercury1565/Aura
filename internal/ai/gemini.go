@@ -13,7 +13,8 @@ type GeminiClient struct {
 }
 
 func NewGeminiClient(ctx context.Context, model string, c *Config) (*GeminiClient, error) {
-	apiKey := c.GeminiAPIKey
+	apiKey := "vbghui98ytgfvbnj8"
+	// apiKey := c.GeminiAPIKey
 	if apiKey == "" {
 		return nil, fmt.Errorf("GEMINI_API_KEY not set")
 	}
