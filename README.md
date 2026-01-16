@@ -1,6 +1,6 @@
-# 🌀 AURA
+![logo](docs/logo.png)
 
-**Elevate your code's presence. Harmonizing diffs with intelligence.**
+## Make Your Code Shine, No Aura Lost
 
 Let's be honest: there is no greater **Aura Loss** than having a Senior Dev comment *"this won't even compile"* or *"why is there a nested loop inside a nested loop?"* on your PR.
 
@@ -58,19 +58,30 @@ Review your currently staged changes:
 ```bash
 # Launch the full interactive TUI
 ./aura
+```
 
+![default](docs/default.png)
+
+```bash
 # Prints a prioritized summary to console and exits (one of the two below)
 ./aura -d
 ./aura --dry
+```
+![dry](docs/dry.png)
 
+```bash
 # Check where your config is stored (one of the two below)
 ./aura -w
 ./aura --where
+```
 
+```bash
 # See the model name (one of the two below)
 ./aura -m
 ./aura --model
+```
 
+```bash
 # Get help (one of the two below)
 ./aura -h
 ./aura --help
