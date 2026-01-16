@@ -5,13 +5,15 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Mercury1565/Aura/internal/utils"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	GroqAPIKey   string `mapstructure:"groq_api_key"`
-	GeminiAPIKey string `mapstructure:"gemini_api_key"`
-	ModelName    string `mapstructure:"model_name"`
+	GroqAPIKey      string `mapstructure:"groq_api_key"`
+	GeminiAPIKey    string `mapstructure:"gemini_api_key"`
+	ModelName       string `mapstructure:"model_name"`
+	BaseInstruction string `mapstructure:"base_instruction"`
 }
 
 func LoadConfig() (*Config, error) {
@@ -31,8 +33,16 @@ func LoadConfig() (*Config, error) {
 	}
 
 	var cfg Config
-	err := viper.Unmarshal(&cfg)
-	return &cfg, err
+	if err := viper.Unmarshal(&cfg); err != nil {
+		return nil, err
+	}
+
+	// Set default BaseInstruction if it's empty
+	if cfg.BaseInstruction == "" {
+		cfg.SetAndSave("base_instruction", utils.BaseInstruction)
+	}
+
+	return &cfg, nil
 }
 
 func (c *Config) SetAndSave(key string, value string) error {

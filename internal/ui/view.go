@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Mercury1565/Aura/internal/utils"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -59,10 +60,10 @@ func (m Model) renderDiffContent() string {
 					var b strings.Builder
 
 					labelAuraStyle := lipgloss.NewStyle().
-					    Foreground(Color(ColorIssue)).
-					    Bold(true).
-					    Align(lipgloss.Center).
-					    Width(aiWindowWidth - 4)
+						Foreground(Color(ColorIssue)).
+						Bold(true).
+						Align(lipgloss.Center).
+						Width(aiWindowWidth - 4)
 
 					labelTypeStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponseTag))
 					labelIssueStyle := lipgloss.NewStyle().Foreground(Color(ColorAIResponseTag))
@@ -86,9 +87,9 @@ func (m Model) renderDiffContent() string {
 
 					// 3. Create the divider line
 					divider := lipgloss.NewStyle().
-					    Foreground(Color(ColorLineNumber)).
-					    Faint(true).
-					    Render(strings.Repeat("─", aiWindowWidth-4))
+						Foreground(Color(ColorLineNumber)).
+						Faint(true).
+						Render(strings.Repeat("─", aiWindowWidth-4))
 
 					comment := lipgloss.NewStyle().
 						Width(aiWindowWidth - 4).
@@ -196,17 +197,7 @@ func (m Model) renderError() string {
 }
 
 func (m Model) renderLoading() string {
-	auraLogo := `
-	 ___       ___                ___        ____     ___
-    /   |     /\  \              /\  \      / __ \   /\  \
-   / /| |    /::\  \            /::\  \    / /_/ /  /::\  \
-  / / | |   /:/\:\__\  __  __  /:/\:\__\  / / __/  /:/\:\__\  ___
- --------  /:/ /:/  / / / / / /:/ /:/  / / / | |  /:/ /:/  / /   |
-/ /   | | /:/_/:/  / / / / / /:/_/:/  / / /  | | /:/_/:/  / / /| |
-          \:\/:/  / / / / /  \:\/:/  /           \:\/:/  / / / | |
-           \::/  / / /_/ /    \::/  /             \::/  / --------
-            \/__/  \____/      \/__/               \/__/ / /   | |`
-
+	auraLogo := utils.AuraLogo
 	colorIndex := m.Frame % len(logoShimmerColors)
 
 	logo := lipgloss.NewStyle().
@@ -244,24 +235,24 @@ func (m Model) View() string {
 }
 
 func (m Model) headerView() string {
-    if m.TerminalWidth == 0 {
-        return ""
-    }
+	if m.TerminalWidth == 0 {
+		return ""
+	}
 
-    headerStyle := lipgloss.NewStyle().
-        Bold(true).
-        Foreground(lipgloss.Color(Color(ColorAIResponseTag))).
-        Align(lipgloss.Center).
-        Width(m.TerminalWidth).
-        Height(2)
+	headerStyle := lipgloss.NewStyle().
+		Bold(true).
+		Foreground(lipgloss.Color(Color(ColorAIResponseTag))).
+		Align(lipgloss.Center).
+		Width(m.TerminalWidth).
+		Height(2)
 
-    title := "[A]-[U]-[R]-[A]"
+	title := "[A]-[U]-[R]-[A]"
 
-    instructions := lipgloss.NewStyle().
-        Faint(true).
-        Bold(false).
-        Foreground(lipgloss.Color(Color(ColorAI))).
-        Render("[q: quit | shift+↑/↓: scroll feedback]")
+	instructions := lipgloss.NewStyle().
+		Faint(true).
+		Bold(false).
+		Foreground(lipgloss.Color(Color(ColorAI))).
+		Render("[q: quit | shift+↑/↓: scroll feedback]")
 
-    return headerStyle.Render(title + "\n" + instructions)
+	return headerStyle.Render(title + "\n" + instructions)
 }

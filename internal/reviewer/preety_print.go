@@ -3,12 +3,10 @@ package reviewer
 import (
 	"fmt"
 
-	"github.com/Mercury1565/Aura/internal/utils"
 	"github.com/charmbracelet/lipgloss"
 )
 
 var (
-	AuraLogoColor   = lipgloss.Color("205") // bright pink
 	SummaryColor    = lipgloss.Color("252") // bright white
 	TypeColor       = lipgloss.Color("220") // bright yellow
 	IssueColor      = lipgloss.Color("214") // orange
@@ -17,11 +15,6 @@ var (
 )
 
 func (r *CodeReview) PrettyPrint() {
-	logoStyle := lipgloss.NewStyle().
-		Foreground(lipgloss.Color(AuraLogoColor)).
-		Bold(true).
-		MarginBottom(1)
-
 	summaryStyle := lipgloss.NewStyle().
 		Foreground(lipgloss.Color(SummaryColor)).
 		Italic(true)
@@ -31,7 +24,6 @@ func (r *CodeReview) PrettyPrint() {
 	suggestionStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(SuggestionColor)).Bold(true)
 	auraLossStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(AuraLossColor)).Bold(true)
 
-	fmt.Println(logoStyle.Render(utils.AuraLogo))
 	fmt.Println(summaryStyle.Render(r.Summary) + "\n")
 
 	for _, rev := range r.Reviews {

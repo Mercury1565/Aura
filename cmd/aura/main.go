@@ -15,11 +15,11 @@ var helpContent string
 
 // custom flags
 var (
-    dryMode   bool
-    showPath  bool
-    showModel bool
-    reviewAll bool
-    contextLines int
+	dryMode      bool
+	showPath     bool
+	showModel    bool
+	reviewAll    bool
+	contextLines int
 )
 
 func flagsInit() {
@@ -40,7 +40,7 @@ func flagsInit() {
 	flag.BoolVar(&reviewAll, "all", true, "review all changes (including unstaged")
 
 	flag.IntVar(&contextLines, "c", 3, "number of context lines for the diff")
-    flag.IntVar(&contextLines, "context", 3, "number of context lines for the diff")
+	flag.IntVar(&contextLines, "context", 3, "number of context lines for the diff")
 
 	flag.Parse()
 }
@@ -54,36 +54,36 @@ func main() {
 	}
 
 	// Intercept config command early
-    if len(os.Args) > 1 && os.Args[1] == "config" {
-        if len(os.Args) > 3 {
-            cfg.HandleConfigSet(os.Args)
-        } else {
-            fmt.Println("Usage: aura config <key> <value>")
-        }
-        return
-    }
+	if len(os.Args) > 1 && os.Args[1] == "config" {
+		if len(os.Args) > 3 {
+			cfg.HandleConfigSet(os.Args)
+		} else {
+			fmt.Println("Usage: aura config <key> <value>")
+		}
+		return
+	}
 
-    flagsInit()
+	flagsInit()
 
-    // Handle information-only flags
-    if showPath {
-        fmt.Printf("Config file used: %s\n", viper.ConfigFileUsed())
-        return
-    }
-    if showModel {
-        fmt.Printf("Model name: %s\n", cfg.ModelName)
-        return
-    }
+	// Handle information-only flags
+	if showPath {
+		fmt.Printf("Config file used: %s\n", viper.ConfigFileUsed())
+		return
+	}
+	if showModel {
+		fmt.Printf("Model name: %s\n", cfg.ModelName)
+		return
+	}
 
-    if err := cfg.Validate(); err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
+	if err := cfg.Validate(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-    // We choose the function once, then call it with the same params
-    if dryMode {
-        DryMode(cfg, contextLines, reviewAll)
-    } else {
-        DefaultMode(cfg, contextLines, reviewAll)
-    }
+	// We choose the function once, then call it with the same params
+	if dryMode {
+		DryMode(cfg, contextLines, reviewAll)
+	} else {
+		DefaultMode(cfg, contextLines, reviewAll)
+	}
 }

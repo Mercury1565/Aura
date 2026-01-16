@@ -14,7 +14,7 @@ const (
 	ColorLineNumber       ColorName = "line_number"
 	ColorLoadingText      ColorName = "loading_text"
 	ColorAI               ColorName = "ai"
-	ColorAIResponseTag     ColorName = "ai_response_tags"
+	ColorAIResponseTag    ColorName = "ai_response_tags"
 	ColorAIScroll         ColorName = "ai_scroll"
 	ColorAuraLogo         ColorName = "aura_logo"
 	ColorType             ColorName = "type"
@@ -67,23 +67,23 @@ func Color(name ColorName) lipgloss.Color {
 }
 
 var logoShimmerColors = []string{
-    "93",  // bright magenta
-    "129", // pink
-    "165", // hot pink
-    "201", // bright pink
-    "199", // neon pink
-    "196", // bright red
-    "202", // orange-red
-    "208", // orange
-    "214", // gold
-    "220", // bright yellow
-    "226", // yellow
-    "220",
-    "214",
-    "208",
-    "202",
-    "199",
-    "196",
-    "165",
-    "129",
+	"93",  // bright magenta
+	"129", // pink
+	"165", // hot pink
+	"201", // bright pink
+	"199", // neon pink
+	"196", // bright red
+	"202", // orange-red
+	"208", // orange
+	"214", // gold
+	"220", // bright yellow
+	"226", // yellow
+	"220",
+	"214",
+	"208",
+	"202",
+	"199",
+	"196",
+	"165",
+	"129",
 }

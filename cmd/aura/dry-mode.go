@@ -8,11 +8,14 @@ import (
 	"github.com/Mercury1565/Aura/internal/ai"
 	"github.com/Mercury1565/Aura/internal/git"
 	"github.com/Mercury1565/Aura/internal/reviewer"
+	"github.com/Mercury1565/Aura/internal/utils"
 )
 
 func DryMode(cfg *ai.Config, contextLines int, staged bool) {
 	ctx := context.Background()
 	modelName := cfg.ModelName
+
+	utils.LogoPrettyPrint()
 
 	llm, err := ai.NewGroqClient(modelName, cfg)
 	if err != nil {
